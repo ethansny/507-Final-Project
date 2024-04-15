@@ -37,3 +37,26 @@ def r_c_w_p(input_string):
 def clean_string(input_string):
     r_c_w_p(input_string)
     return input_string.strip()
+
+def get_priority_input(prompt):
+    while True:
+        try:
+            value = float(input(prompt))
+            if 0 <= value <= 1:
+                return value
+            else:
+                print("Please enter a value between 0 and 1.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+
+def get_distance_input(prompt):
+    while True:
+        try:
+            value = float(input(prompt))
+            if value >= 0:
+                return value
+            else:
+                print("Please enter a positive value.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
