@@ -1,8 +1,7 @@
 import utility as utl
 import math
-import time
-from multiprocessing import Process
 from tqdm import tqdm
+for get_snow_data import get_snow_data
 
 class Network:
     """
@@ -264,7 +263,11 @@ def calculate_proportion_of_black_runs(node):
     except:
         return None
 
-
+def add_connections(node, nodes):
+    for other_node in nodes:
+        if node != other_node:
+            distance = calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
+            node.add_connection(other_node, distance)
 
 def main():
     network = Network()
