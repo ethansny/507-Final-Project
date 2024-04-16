@@ -1,7 +1,9 @@
 import utility as utl
 import math
 from tqdm import tqdm
-for get_snow_data import get_snow_data
+from get_snow_data import get_snow_data
+import time
+import os
 
 class Network:
     """
@@ -164,6 +166,7 @@ class Node:
         self.blue_runs = None
         self.black_runs = None
         self.propotion_of_black_runs = None
+        self.normalized_snow_depth = None
 
     def add_connection(self, node, distance):
         """
@@ -195,16 +198,23 @@ class Node:
         """
         score = 0
         num_factors = 0
+        if self.normalized_snow_depth is not None:
+            score += self.normalized_snow_depth
+            num_factors += 1
+
         for factor, priority in factors:
             factor_value = getattr(self, factor, None)
             if factor_value is not None:
                 score += factor_value * priority
                 num_factors += 1
-        for other_node, distance in self.connections.items():
-            if distance is not None and distance < max_distance and distance != 0 and other_node.score != 0:
-                score += other_node.score
-                num_factors += 1
+        if max_distance > 0:
+            for other_node, distance in self.connections.items():
+                if distance is not None and distance < max_distance and distance != 0 and other_node.score != 0:
+                    score += other_node.score
+                    num_factors += 1
         if score == 0:
+            return 0
+        if num_factors < 3:
             return 0
         self.score = score / num_factors
 
@@ -271,46 +281,70 @@ def add_connections(node, nodes):
 
 def main():
     network = Network()
-    
+
+    cache_file = "cache.json"
+
+    try:
+        # Try to open the cache file
+        cache = utl.read_json(cache_file)
+        file_time = os.path.getmtime(cache_file)
+        if (time.time() - file_time) / (24 * 60 * 60) > 3:
+            cache = {}
+    except FileNotFoundError:
+        # If the file is not found, create an empty cache
+        cache = {}
+
     resorts = utl.read_csv_to_dicts("resortworldwide.csv")
     nodes = []
     print("List of continents: Africa, Antarctica, Asia, Europe, North America, Oceania, South America")
     while True:
         continent = input("Enter a continent from the above list: ")
-        if continent in ["Africa", "Antarctica", "Asia", "Europe", "North America", "Oceania", "South America"]:
+        if continent in ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]:
             break
         else:
             print("Invalid continent. Please try again.")
+    resorts_in_continent = [resort for resort in resorts if resort["Continent"] == continent]
+    print(f"Found {len(resorts_in_continent)} resorts in {continent}. \n Getting snow data...")
 
-    for resort in resorts:
-        if resort["Continent"] == continent:
-            node = Node()
-            node.name = resort["NameResort"]
-            node.url = resort["URL"]
-            node.stars = utl.to_int(resort["Stars"])
-            node.km_freeride = utl.to_int(resort["Km Freeride"])
-            node.latitude = utl.to_float(resort["latitude"])
-            node.longitude = utl.to_float(resort["longitude"])
-            node.score = 0
-            node.connections = {}
-            node.continent = resort["Continent"]
-            node.snow_reliability = utl.to_int(utl.clean_string(resort["Snow reliability "]))
-            node.apres_ski = utl.to_int(utl.clean_string(resort["Après-ski "]))
-            node.resort_size = utl.to_int(utl.clean_string(resort["Ski resort size "]))
-            node.variety_of_runs = utl.to_int(utl.clean_string(resort["Slope offering, variety of runs "]))
-            node.cleanliness = utl.to_int(utl.clean_string(resort["Cleanliness and hygiene "]))
-            node.green_runs = utl.to_int(resort["Easy"])
-            node.blue_runs = utl.to_int(resort["Intermediate "])
-            node.black_runs = utl.to_int(resort["Difficult"])
-            node.propotion_of_black_runs = calculate_proportion_of_black_runs(node)
-            nodes.append(node)
+    for resort in tqdm(resorts_in_continent):
+        node = Node()
+        node.name = resort["NameResort"]
+        node.url = resort["URL"]
+        node.stars = utl.to_int(resort["Stars"])
+        node.km_freeride = utl.to_int(resort["Km Freeride"])
+        node.latitude = utl.to_float(resort["latitude"])
+        node.longitude = utl.to_float(resort["longitude"])
+        node.score = 0
+        node.connections = {}
+        node.continent = resort["Continent"]
+        node.snow_reliability = utl.to_int(utl.clean_string(resort["Snow reliability "]))
+        node.apres_ski = utl.to_int(utl.clean_string(resort["Après-ski "]))
+        node.resort_size = utl.to_int(utl.clean_string(resort["Ski resort size "]))
+        node.variety_of_runs = utl.to_int(utl.clean_string(resort["Slope offering, variety of runs "]))
+        node.cleanliness = utl.to_int(utl.clean_string(resort["Cleanliness and hygiene "]))
+        node.green_runs = utl.to_int(resort["Easy"])
+        node.blue_runs = utl.to_int(resort["Intermediate "])
+        node.black_runs = utl.to_int(resort["Difficult"])
+        node.propotion_of_black_runs = calculate_proportion_of_black_runs(node)
+        try:
+            node.current_snow = cache[node.name]
+        except:
+            node.current_snow = get_snow_data(node.name)
+            cache[node.name] = node.current_snow
+        nodes.append(node)
 
+    utl.write_json(cache_file, cache)
+    
+    max_snow_depth = max([node.current_snow for node in nodes if node.current_snow is not None])
+
+    print(f"\nConnecting resorts...")
     for node in tqdm(nodes):
         network.add_node(node)
         for other_node in nodes:
             if node != other_node:
                 distance = calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
                 node.add_connection(other_node, distance)
+                node.normalized_snow_depth = (node.current_snow / max_snow_depth * 5) if node.current_snow is not None else None
 
     factors = ["snow_reliability", "apres_ski", "resort_size", "variety_of_runs", "cleanliness", "proportion_of_black_runs"]
     priorities = []
@@ -321,10 +355,11 @@ def main():
 
     distance = utl.get_distance_input("Enter a distance in kilometers: ")
 
-
+    print("\nCalculating scores...")
     for node in tqdm(network.nodes):
         node.calculate_score(priorities, distance)
 
+    print("\nTop resorts:")
     high_node = network.get_high_score()
     for node in high_node[::-1]:
         print(node.name, node.score)
