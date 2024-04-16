@@ -179,29 +179,30 @@ class Node:
         """
         self.connections[node] = distance
 
-    def calculate_score(self, priority=1, priority2=1, priority3=1, priority4=1, priority5=1, priority6=1, max_distance=100):
+    def calculate_score(self, factors, max_distance=100):
+        """
+        Calculates the score of the node based on the specified factors and their priorities.
+
+        Parameters
+        ----------
+        factors : list of tuples
+            a list of tuples where each tuple contains a factor (as a string) and its priority (as a float)
+        max_distance : float
+            the maximum distance for connections to be considered in the score calculation
+
+        Returns
+        -------
+        None
+        """
         score = 0
         num_factors = 0
-        if self.snow_reliability is not None:
-            score += (self.snow_reliability * priority)
-            num_factors += 1
-        if self.apres_ski is not None:
-            score += (self.apres_ski * priority2)
-            num_factors += 1
-        if self.resort_size is not None:
-            score += (self.resort_size * priority3)
-            num_factors += 1
-        if self.variety_of_runs is not None:
-            score += (self.variety_of_runs * priority4)
-            num_factors += 1
-        if self.cleanliness is not None:
-            score += (self.cleanliness * priority5)
-            num_factors += 1
-        if self.propotion_of_black_runs is not None:
-            score += (self.propotion_of_black_runs * priority6)
-            num_factors += 1
+        for factor, priority in factors:
+            factor_value = getattr(self, factor, None)
+            if factor_value is not None:
+                score += factor_value * priority
+                num_factors += 1
         for other_node, distance in self.connections.items():
-            if distance is not None and distance < max_distance:
+            if distance is not None and distance < max_distance and distance != 0 and other_node.score != 0:
                 score += other_node.score
                 num_factors += 1
         if score == 0:
@@ -249,7 +250,8 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
         # Calculate distance
         distance = r * c
-
+        if distance == 0.0:
+            return None
         return distance
     except TypeError:
         return None
@@ -289,11 +291,11 @@ def main():
             node.score = 0
             node.connections = {}
             node.continent = resort["Continent"]
-            node.snow_reliability = utl.to_int(utl.r_c_w_p(resort["Snow reliability "]))
-            node.apres_ski = utl.to_int(utl.r_c_w_p(resort["Après-ski "]))
-            node.resort_size = utl.to_int(utl.r_c_w_p(resort["Ski resort size "]))
-            node.variety_of_runs = utl.to_int(utl.r_c_w_p(resort["Slope offering, variety of runs "]))
-            node.cleanliness = utl.to_int(utl.r_c_w_p(resort["Cleanliness and hygiene "]))
+            node.snow_reliability = utl.to_int(utl.clean_string(resort["Snow reliability "]))
+            node.apres_ski = utl.to_int(utl.clean_string(resort["Après-ski "]))
+            node.resort_size = utl.to_int(utl.clean_string(resort["Ski resort size "]))
+            node.variety_of_runs = utl.to_int(utl.clean_string(resort["Slope offering, variety of runs "]))
+            node.cleanliness = utl.to_int(utl.clean_string(resort["Cleanliness and hygiene "]))
             node.green_runs = utl.to_int(resort["Easy"])
             node.blue_runs = utl.to_int(resort["Intermediate "])
             node.black_runs = utl.to_int(resort["Difficult"])
@@ -307,17 +309,18 @@ def main():
                 distance = calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
                 node.add_connection(other_node, distance)
 
-    priority = utl.get_priority_input("Enter a priority for snow reliability (0-1): ")
-    priority2 = utl.get_priority_input("Enter a priority for apres ski (0-1): ")
-    priority3 = utl.get_priority_input("Enter a priority for resort size (0-1): ")
-    priority4 = utl.get_priority_input("Enter a priority for variety of runs (0-1): ")
-    priority5 = utl.get_priority_input("Enter a priority for cleanliness (0-1): ")
-    priority6 = utl.get_priority_input("Enter a priority for proportion of black runs (0-1): ")
+    factors = ["snow_reliability", "apres_ski", "resort_size", "variety_of_runs", "cleanliness", "proportion_of_black_runs"]
+    priorities = []
+
+    for factor in factors:
+        priority = utl.get_priority_input(f"Enter a priority for {factor} (0-1): ")
+        priorities.append((factor, priority))
+
     distance = utl.get_distance_input("Enter a distance in kilometers: ")
 
 
     for node in tqdm(network.nodes):
-        node.calculate_score(priority, priority2, priority3, priority4, priority5, priority6, distance)
+        node.calculate_score(priorities, distance)
 
     high_node = network.get_high_score()
     for node in high_node[::-1]:
