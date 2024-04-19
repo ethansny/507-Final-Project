@@ -214,7 +214,7 @@ class Node:
                     num_factors += 1
         if score == 0:
             return 0
-        if num_factors < 3:
+        if num_factors < 2:
             return 0
         self.score = score / num_factors
 
