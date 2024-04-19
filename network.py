@@ -143,30 +143,36 @@ class Node:
     add_connection(node, distance):
         Adds a connection to another node with a specified distance.
     """
-    def __init__(self):
-        """
-        Constructs all the necessary attributes for the node object.
-        """
-        self.name = None
-        self.score = 0
-        self.connections = {}
-        self.url = None
-        self.km_freeride = None
-        self.continent = None
-        self.country = None
-        self.state_province = None
-        self.snow_reliability = None
-        self.apres_ski = None
-        self.latitude = None
-        self.longitude = None
-        self.resort_size = None
-        self.variety_of_runs = None
-        self.cleanliness = None
-        self.green_runs = None
-        self.blue_runs = None
-        self.black_runs = None
-        self.propotion_of_black_runs = None
-        self.normalized_snow_depth = None
+    class Network:
+        __slots__ = ('name', 'score', 'connections', 'url', 'km_freeride', 'continent', 'country', 'state_province', 
+                     'snow_reliability', 'apres_ski', 'latitude', 'longitude', 'resort_size', 'variety_of_runs', 
+                     'cleanliness', 'green_runs', 'blue_runs', 'black_runs', 'propotion_of_black_runs', 
+                     'normalized_snow_depth')
+
+        def __init__(self):
+            """
+            Constructs all the necessary attributes for the node object.
+            """
+            self.name = None
+            self.score = 0
+            self.connections = {}
+            self.url = None
+            self.km_freeride = None
+            self.continent = None
+            self.country = None
+            self.state_province = None
+            self.snow_reliability = None
+            self.apres_ski = None
+            self.latitude = None
+            self.longitude = None
+            self.resort_size = None
+            self.variety_of_runs = None
+            self.cleanliness = None
+            self.green_runs = None
+            self.blue_runs = None
+            self.black_runs = None
+            self.propotion_of_black_runs = None
+            self.normalized_snow_depth = None
 
     def add_connection(self, node, distance):
         """
