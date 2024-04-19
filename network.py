@@ -204,6 +204,7 @@ class Node:
         """
         score = 0
         num_factors = 0
+
         if self.normalized_snow_depth is not None:
             score += self.normalized_snow_depth
             num_factors += 1
@@ -213,17 +214,35 @@ class Node:
             if factor_value is not None:
                 score += factor_value * priority
                 num_factors += 1
+
         if max_distance > 0:
             for other_node, distance in self.connections.items():
                 if distance is not None and distance < max_distance and distance != 0 and other_node.score != 0:
                     score += other_node.score
                     num_factors += 1
+
         if score == 0:
             return 0
+
         if num_factors < 2:
             return 0
         self.score = score / num_factors
 
+def add_connections(node, nodes):
+    """
+    Add connections between the given node and other nodes in the network.
+
+    Parameters:
+    - node: The node to add connections to.
+    - nodes: A list of other nodes in the network.
+
+    Returns:
+    None
+    """
+    for other_node in nodes:
+        if node != other_node:
+            distance = calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
+            node.add_connection(other_node, distance)
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
@@ -274,16 +293,25 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 
 def calculate_proportion_of_black_runs(node):
+    """
+    Calculate the proportion of black runs for a given node.
+
+    Parameters:
+    node (Node): The node object containing the number of black, green, and blue runs.
+
+    Returns:
+    float: The proportion of black runs, calculated as 5 times the ratio of black runs to the total number of runs.
+
+    Raises:
+    None
+
+    """
     try:
         return 5 * (node.black_runs / (node.green_runs + node.blue_runs + node.black_runs))
     except:
         return None
 
-def add_connections(node, nodes):
-    for other_node in nodes:
-        if node != other_node:
-            distance = calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
-            node.add_connection(other_node, distance)
+
 
 def main():
     network = Network()
@@ -303,13 +331,16 @@ def main():
     resorts = utl.read_csv_to_dicts("resortworldwide.csv")
     nodes = []
     print("List of continents: Africa, Antarctica, Asia, Europe, North America, Oceania, South America")
+
     while True:
         continent = input("Enter a continent from the above list: ")
         if continent in ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]:
             break
         else:
             print("Invalid continent. Please try again.")
+
     resorts_in_continent = [resort for resort in resorts if resort["Continent"] == continent]
+
     print(f"Found {len(resorts_in_continent)} resorts in {continent}. \n Getting snow data...")
 
     for resort in tqdm(resorts_in_continent):
@@ -340,7 +371,7 @@ def main():
         nodes.append(node)
 
     utl.write_json(cache_file, cache)
-    
+
     max_snow_depth = max([node.current_snow for node in nodes if node.current_snow is not None])
 
     print(f"\nConnecting resorts...")
@@ -353,8 +384,8 @@ def main():
                 node.normalized_snow_depth = (node.current_snow / max_snow_depth * 5) if node.current_snow is not None else None
 
     factors = ["snow_reliability", "apres_ski", "resort_size", "variety_of_runs", "cleanliness", "proportion_of_black_runs"]
-    priorities = []
 
+    priorities = []
     for factor in factors:
         priority = utl.get_priority_input(f"Enter a priority for {factor} (0-1): ")
         priorities.append((factor, priority))
