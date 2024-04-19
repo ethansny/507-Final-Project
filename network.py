@@ -340,7 +340,7 @@ def main():
 
     while True:
         continent = input("Enter a continent from the above list: ")
-        if continent in ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]:
+        if continent.lower().strip() in ["africa", "asia", "europe", "north america", "oceania", "south America"]:
             break
         else:
             print("Invalid continent. Please try again.")
