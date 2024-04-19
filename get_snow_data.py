@@ -1,8 +1,4 @@
 import requests
-import json
-import time
-import utility as utl
-import os
 
 headers = {
 	"X-RapidAPI-Key": "ce76d5a1b4msh8fb38a44ed05901p1c72d0jsn6c01ab4d8054",
