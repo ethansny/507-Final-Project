@@ -322,8 +322,14 @@ def main():
         # Try to open the cache file
         cache = utl.read_json(cache_file)
         file_time = os.path.getmtime(cache_file)
-        if (time.time() - file_time) / (24 * 60 * 60) > 3:
-            cache = {}
+
+        # This would be production code, but if it has been more than three days
+        # since the cache was last updated it take a very long time for it to run
+
+        # if (time.time() - file_time) / (24 * 60 * 60) > 3:
+        #     cache = {}
+
+
     except FileNotFoundError:
         # If the file is not found, create an empty cache
         cache = {}
