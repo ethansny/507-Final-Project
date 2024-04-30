@@ -1,3 +1,6 @@
+Certainly! Here is the same content for the README in plain text format, which you can save as `README.txt`. Remember to insert your actual API key and complete the `[DATA_STRUCTURE_DESCRIPTION]` section.
+
+```
 Snow Resort Networking Project
 ==============================
 
@@ -10,7 +13,7 @@ Prerequisites
 Before running this project, ensure you have the following Python packages installed:
 - tqdm
 - requests
-
+- fuzzywuzzy
 
 How to Run
 ----------
@@ -29,7 +32,12 @@ When the user runs the main program, they are presented with a series of interac
    - The user is presented with a list of continents (Africa, Antarctica, Asia, Europe, North America, Oceania, South America).
    - The user is prompted to enter a continent from the list.
 
-2. Set Priorities:
+2. Choose recommendation or search
+   - User decides if they want to search for a resort or have the program make a recommendation based on their priorities
+
+	- Search returns information about the resort if it was found
+
+3. Set Priorities:
    - The user is asked to set priorities (between 0 and 1) for various factors that might affect their choice of snow resort. These factors include snow reliability, après-ski, resort size, variety of runs, cleanliness, and proportion of black runs.
 
 3. Input Maximum Distance:
