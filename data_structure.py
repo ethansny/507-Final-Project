@@ -1,4 +1,5 @@
 import utility as utl
+import math
 from get_snow_data import get_snow_data
 class Network:
     """
@@ -64,6 +65,68 @@ class Network:
                 return node
         return None
 
+
+    def add_connections(self, node):
+        """
+        Add connections between the given node and other nodes in the network.
+
+        Parameters:
+        - node: The node to add connections to.
+
+        Returns:
+        None
+        """
+        for other_node in self.nodes:  # assuming self.nodes is a list of nodes in the network
+            if node != other_node:
+                distance = Network.calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
+                node.add_connection(other_node, distance)
+
+    @staticmethod
+    def calculate_distance(lat1, lon1, lat2, lon2):
+        """
+        Calculate the distance between two points.
+
+        Given longitudes and latitudes using the Haversine formula.
+
+        Parameters
+        ----------
+        lat1 : float
+            Latitude of the first point in decimal degrees.
+        lon1 : float
+            Longitude of the first point in decimal degrees.
+        lat2 : float
+            Latitude of the second point in decimal degrees.
+        lon2 : float
+            Longitude of the second point in decimal degrees.
+
+        Returns
+        -------
+        float
+            The great-circle distance between the two points in kilometers.
+            Returns None if any of the inputs are not numbers (TypeError).
+
+        """
+        try:
+            lat1 = math.radians(lat1)
+            lon1 = math.radians(lon1)
+            lat2 = math.radians(lat2)
+            lon2 = math.radians(lon2)
+
+            # Haversine formula
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+            r = 6371.0
+
+            # Calculate distance
+            distance = r * c
+            if distance == 0.0:
+                return None
+            return distance
+        except TypeError:
+            return None
 
     def get_high_score(self):
         """
@@ -166,6 +229,29 @@ class Node:
         self.black_runs = None
         self.propotion_of_black_runs = None
         self.normalized_snow_depth = None
+    
+    def describe(self):
+        """
+        Returns a string representation of the node.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            a string representation of the node
+        """
+        print(f"\nYou chose {self.name}. Here's more information:")
+        print(f"Score: {self.score}")
+        print(f"URL: {self.url}")
+        print(f"Stars: {self.stars}")
+        print(f"Km Freeride: {self.km_freeride}")
+        print(f"Apre Rating: {self.apres_ski}")
+        print(f"Snow reliability: {self.snow_reliability}")
+        print(f"Normalized Snow depth: {self.normalized_snow_depth}")
+        
 
     def calculate_proportion_of_black_runs(self):
         """
