@@ -1,6 +1,7 @@
 import utility as utl
 import math
 from get_snow_data import get_snow_data
+from fuzzywuzzy import fuzz
 class Network:
     """
     A class to represent a network.
@@ -65,6 +66,30 @@ class Network:
                 return node
         return None
 
+    def search_resort(self, resort_name):
+        """
+        Search for a resort in the network by name, allowing for close matches.
+
+        Parameters
+        ----------
+        resort_name : str
+            The name of the resort to search for.
+
+        Returns
+        -------
+        Node
+            The node representing the resort, or None if the resort is not found.
+        """
+        max_ratio = -1
+        best_match = None
+
+        for node in self.nodes:
+            ratio = fuzz.ratio(node.name.lower(), resort_name.lower())
+            if ratio > max_ratio:
+                max_ratio = ratio
+                best_match = node
+
+        return best_match if max_ratio > 80 else None 
 
     def add_connections(self, node):
         """
@@ -76,7 +101,7 @@ class Network:
         Returns:
         None
         """
-        for other_node in self.nodes:  # assuming self.nodes is a list of nodes in the network
+        for other_node in self.nodes:  
             if node != other_node:
                 distance = Network.calculate_distance(node.latitude, node.longitude, other_node.latitude, other_node.longitude)
                 node.add_connection(other_node, distance)

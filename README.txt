@@ -11,16 +11,9 @@ This project aims to create a network of snow resorts with various data attribut
 Prerequisites
 -------------
 Before running this project, ensure you have the following Python packages installed:
-- utility
-- math
 - tqdm
 - requests
-- json
-- os
-- time
 
-Additionally, you will need an API key to access the snow data:
-- Obtained from RapidAPI: [API_KEY_HERE]
 
 How to Run
 ----------
@@ -29,14 +22,32 @@ How to Run
 3. Run the main Python file using 'python main.py' in your command-line interface.
 4. Follow the on-screen prompts to select a continent and other preferences.
 
+
 User Interactions
 -----------------
-- Users will start by selecting a continent from the provided list.
-- The program will then retrieve resorts within the selected continent and gather snow data.
-- Users will be asked to provide priorities for various resort attributes.
-- Users can also specify a maximum connection distance to consider between resorts.
-- Finally, the program calculates scores for each resort based on user inputs and displays the top resorts.
-- The user can then view different resort details or view attributes about another node
+
+When the user runs the main program, they are presented with a series of interactions that allow them to explore and analyze different snow resorts based on various factors. The interactions proceed as follows:
+
+1. Select Continent: 
+   - The user is presented with a list of continents (Africa, Antarctica, Asia, Europe, North America, Oceania, South America).
+   - The user is prompted to enter a continent from the list.
+
+2. Set Priorities:
+   - The user is asked to set priorities (between 0 and 1) for various factors that might affect their choice of snow resort. These factors include snow reliability, après-ski, resort size, variety of runs, cleanliness, and proportion of black runs.
+
+3. Input Maximum Distance:
+   - The user can specify a maximum connection distance between resorts, which is considered when generating the scores for each resort.
+
+4. Explore Individual Resorts:
+   - The user can select a number corresponding to one of the top 5 resorts to learn more about it.
+   - If the user enters 'q', the program will cease displaying resort details.
+
+5. Restart or Quit:
+    - After exploring the top resorts, the user is given the option to restart the process and explore another continent or set of preferences, or to end the program.
+
+Each interaction is designed to guide the user through the process smoothly, with input validation to ensure that the user's selections are within expected parameters. If an invalid input is given, the program prompts the user to try again with a valid option.
+
+This interface allows the user to customize the search for their ideal snow resort experience according to their individual preferences and the current snow conditions.
 Network Structure
 -----------------
 - Nodes: Each node represents a ski resort with attributes like snow reliability, resort size, and run variety.
