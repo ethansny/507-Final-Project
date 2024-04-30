@@ -95,7 +95,7 @@ def main():
         #     else:
         #         print("Invalid continent. Please try again.")
 
-        resorts_in_continent = [resort for resort in resorts if resort["Continent"] == continent]
+        resorts_in_continent = [resort for resort in resorts if resort["Continent"].lower().strip() == continent.lower().strip()]
         print(f"Found {len(resorts_in_continent)} resorts in {continent}. \n Getting snow data...")
 
         for resort in tqdm(resorts_in_continent):
@@ -116,8 +116,6 @@ def main():
             network.add_connections(node)
         path_choice = get_path_choice()
 
-
-        path_choice = input("\nWould you like to (1) get recommendations or (2) search for a resort by name? Enter 1 or 2: ")
 
         if path_choice == '1':
             factors = ["snow_reliability", "apres_ski", "resort_size", "variety_of_runs", "cleanliness", "proportion_of_black_runs"]
@@ -151,12 +149,17 @@ def main():
                 except (IndexError, ValueError):
                     print("Invalid choice. Please try again.")
         elif path_choice == '2':
-            resort_name = input("Enter the name of the resort you are looking for: ")
-            result = network.search_resort(resort_name)
-            if result is None:
-                print(f"No resort found with the name {resort_name}.")
-            else:
-                result.describe()
+            while True:
+                resort_name = input("Enter the name of the resort you are looking for, or 'q' to quit: ")
+                if resort_name.lower() == 'q':
+                    break
+
+                result = network.search_resort(resort_name)
+                if result is None:
+                    print(f"No resort found with the name {resort_name}. Please try again.")
+                else:
+                    result.describe_search()
+                    break
 
 
         restart = input("\nWould you like to restart? (y/n): ")

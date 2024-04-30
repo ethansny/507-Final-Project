@@ -276,7 +276,27 @@ class Node:
         print(f"Apre Rating: {self.apres_ski}")
         print(f"Snow reliability: {self.snow_reliability}")
         print(f"Normalized Snow depth: {self.normalized_snow_depth}")
-        
+    
+    def describe_search(self):
+        """
+        Returns a string representation of the node.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            a string representation of the node
+        """
+        print(f"\n{self.name} found. Here's more information:")
+        print(f"URL: {self.url}")
+        print(f"Stars: {self.stars}")
+        print(f"Km Freeride: {self.km_freeride}")
+        print(f"Apre Rating: {self.apres_ski}")
+        print(f"Snow reliability: {self.snow_reliability}")
+        print(f"Normalized Snow depth: {self.normalized_snow_depth}")
 
     def calculate_proportion_of_black_runs(self):
         """
