@@ -1,6 +1,3 @@
-Certainly! Here is the same content for the README in plain text format, which you can save as `README.txt`. Remember to insert your actual API key and complete the `[DATA_STRUCTURE_DESCRIPTION]` section.
-
-```
 Snow Resort Networking Project
 ==============================
 
