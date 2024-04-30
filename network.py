@@ -64,7 +64,7 @@ def main():
 
 
         factors = ["snow_reliability", "apres_ski", "resort_size", "variety_of_runs", "cleanliness", "proportion_of_black_runs"]
-
+        print("\nYour choices for these factors will be used to recommed the best resorts for you given your priorities.")
         priorities = []
         for factor in factors:
             priority = utl.get_priority_input(f"Enter a priority for {factor} (0-1): ")
