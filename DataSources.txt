@@ -1,0 +1,21 @@
+OVERVIEW:
+The Ski Resort Network application uses various data sources to aggregate information about ski resorts and to provide recommendations. This README outlines the origins of the data, their formats, access methods, caching strategies, and a summary of the data variables used by the application.
+
+DATA SOURCES:
+
+1. Resort Data:
+- Origin: The resort information is sourced from a CSV file named 'resortworldwide.csv'.
+- URL: https://www.kaggle.com/datasets/migueldefrutos/ski-resorts-world-wide
+- Format: CSV (Comma-Separated Values)
+- Access Method: Data is read from the CSV file and converted to dictionary objects using a utility function, `read_csv_to_dicts()`.
+- Caching: Data is already cached in csv format and read upon execution of the program.
+- Summary: The dataset contains numerous variables for each resort, including name, location (latitude and longitude), statistics on ski runs, scores given for various amenities like snow reliability and apres ski, and additional details like URLs for the resort websites.
+
+2. Snow Depth Data:
+- Origin: Live snow data is fetched from an API that pulls data using http requests.
+- URL: https://ski-resort-forecast.p.rapidapi.com
+- Format: JSON
+- Access Method: Ski resorts' current snow depth data is fetched using the `get_snow_data()` function, which likely makes HTTP requests to a snow data API.
+- Caching: Snow data for each resort is stored in a JSON file named 'cache.json'. The cache reduces the need for repeated API calls, speeding up the application and mitigating load on the API server. The application reads this cache on startup and updates it if any data is older than its set expiry time or missing.
+- NOTE: Due to the number of resorts, this API is quickly rate limited. For the purposed of this project (also that the amount of snow is quickly dropping to zero) data from a prior data will be used. If un-commented, the script will update the contents of the cache after it is older than 3 days.
+- Summary: Key variables include the name of the ski resort and its current snow depth. This information is cached as JSON to increase the execution rate of the program and allow for data to be used if rate limited

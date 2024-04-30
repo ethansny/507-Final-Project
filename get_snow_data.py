@@ -6,11 +6,6 @@ headers = {
 }
 
 
-import json
-import time
-
-
-
 def get_snow_data(resort_name, headers=headers):
     try:
         querystring = {"units":"i"}
